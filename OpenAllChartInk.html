@@ -4,11 +4,11 @@
 <body style="background-color:powderblue;" background="img/background.png">
 -->
 <body style="background-color:powderblue;">
-<p style="font-size:110%;" id="messageLink"></p>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <p style="font-size:110%;"> Enter Text : <input type="text" id="stockTicker">
-JSON Format: <input type="checkbox" id="jsonFormatCheck">
+52W High: <input type="checkbox" id="52WNewHighFromNSE">
 Text Seperated by Space: <input type="checkbox" id="txtSeperatorSpace">
-<button type="button" onclick="mainFunction()">Open ChartInk links</button>
+<button type="button" id="openChart">Open ChartInk links</button>
 <button type="button" onclick="startOverFunction()">Start Over</button>
 Number of charts to open per click : <input type="text" id="stocksToOpenPerClick" spellcheck="false">
 Start Index : <input type="text" id="startIndex" spellcheck="false">
@@ -18,8 +18,6 @@ Start Index : <input type="text" id="startIndex" spellcheck="false">
 <p id="messageProcessedStocksStats"></p>
 <center> <img src="img/background.png" alt="Background pic" > </center>
 <script>
-var messageLink = document.getElementById("messageLink");
-messageLink.innerHTML = "Copy data from: https://www.nseindia.com/products/dynaContent/equities/equities/json/online52NewHigh.json";
 
 totalStocks = 0;
 processedStocks = 0;
@@ -29,9 +27,9 @@ var messageProcessedStocks = document.getElementById("messageProcessedStocks")
 var messageProcessedStocksStats = document.getElementById("messageProcessedStocksStats");
 document.getElementById("stocksToOpenPerClick").value = 5;
 document.getElementById("startIndex").value = 0;
-jsonFormat = document.getElementById("jsonFormatCheck");
+NewHighFromNSE = document.getElementById("52WNewHighFromNSE");
 txtSeperatorSpace = document.getElementById("txtSeperatorSpace");
-jsonFormat.checked = true;
+NewHighFromNSE.checked = true;
 
 function startOverFunction() {	
 	totalStocks = 0;
@@ -50,62 +48,70 @@ function openPage(stock){
 	window.open(text);
 }
 
-function mainFunction() {
-	var jsonFormat = document.getElementById("jsonFormatCheck");
-	if (copyTextNow == 1) {
-		var stocks_list = document.getElementById("stockTicker").value;
-		if (jsonFormat.checked == true)
-			jsonData = JSON.parse(stocks_list);
-	}
+$(document).ready(function() {
+	$("#openChart").click(function() {
+		var NewHighFromNSE = document.getElementById("52WNewHighFromNSE");
+		if (copyTextNow == 1) {
+			var stocks_list = document.getElementById("stockTicker").value;
+		}
+			
+		var stocksToOpenPerClick = document.getElementById("stocksToOpenPerClick").value;
+		index = document.getElementById("startIndex").value;
+		messageProcessedStocks.innerHTML = strStockProcessed;
 		
-	var stocksToOpenPerClick = document.getElementById("stocksToOpenPerClick").value;
-	index = document.getElementById("startIndex").value;
-	messageProcessedStocks.innerHTML = strStockProcessed;
-	
-	if (processedStocks == 0) {
-		debugger;
-		processedStocks = parseInt(index);
-	}
-	
-	if (jsonFormat.checked == true) {
-		totalStocks = jsonData.data.length;
-		debugger;
-		for (i = processedStocks ; i < totalStocks ; i++) {
+		if (processedStocks == 0) {
 			debugger;
-			strStockProcessed += jsonData.data[i].symbol;
-			strStockProcessed += ", ";
-			openPage(jsonData.data[i].symbol)
-			debugger;
-			processedStocks += 1
-			if (processedStocks % stocksToOpenPerClick == 0)
-				break;
-			debugger;
+			processedStocks = parseInt(index);
 		}
-		messageProcessedStocks.innerHTML = strStockProcessed;
-	} else {
-		debugger;
-		var stocks_list = document.getElementById("stockTicker").value;
-		txtSeperatorSpace = document.getElementById("txtSeperatorSpace");
-		if(txtSeperatorSpace.checked == true) {
-			seperator = " ";
+		
+		if (NewHighFromNSE.checked == true) {
+			$.getJSON("https://www.nseindia.com/products/dynaContent/equities/equities/json/online52NewHigh.json", function(result){
+				debugger
+				$.each(result, function(j, field) {
+					if (j == "data") {
+						totalStocks = field.length
+						for (i = processedStocks ; i < totalStocks ; i++ ) {
+							strStockProcessed += field[i].symbol;
+							strStockProcessed += ", ";
+							messageProcessedStocks.innerHTML = strStockProcessed;
+							messageProcessedStocksStats.innerHTML = "Total stocks: " + totalStocks + " Processed: " + processedStocks
+							openPage(field[i].symbol)
+							processedStocks += 1
+							if (processedStocks % stocksToOpenPerClick == 0) {
+								debugger
+								break;
+							}
+						}
+						debugger
+					}
+				});
+			});
+			
 		} else {
-			seperator = ",";
-		}
-		var stocks = stocks_list.split(seperator)
-		totalStocks = stocks.length - 1;
-		for (i = processedStocks ; i < stocks.length -1; i++) {
 			debugger;
-			strStockProcessed += stocks[i];
-			strStockProcessed += ", ";
-			openPage(stocks[i]);
-			processedStocks += 1
-			if (processedStocks % stocksToOpenPerClick == 0)
-				break;
+			var stocks_list = document.getElementById("stockTicker").value;
+			txtSeperatorSpace = document.getElementById("txtSeperatorSpace");
+			if(txtSeperatorSpace.checked == true) {
+				seperator = " ";
+			} else {
+				seperator = ",";
+			}
+			var stocks = stocks_list.split(seperator)
+			totalStocks = stocks.length - 1;
+			for (i = processedStocks ; i < stocks.length -1; i++) {
+				debugger;
+				strStockProcessed += stocks[i];
+				strStockProcessed += ", ";
+				openPage(stocks[i]);
+				processedStocks += 1
+				if (processedStocks % stocksToOpenPerClick == 0)
+					break;
+			}
+			messageProcessedStocks.innerHTML = strStockProcessed;
 		}
-		messageProcessedStocks.innerHTML = strStockProcessed;
-	}
-	messageProcessedStocksStats.innerHTML = "Total stocks: " + totalStocks + " Processed: " + processedStocks
-}
+		messageProcessedStocksStats.innerHTML = "Total stocks: " + totalStocks + " Processed: " + processedStocks
+	});
+});
 </script>
 </body>
 </html>
