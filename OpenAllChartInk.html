@@ -74,9 +74,9 @@ $(document).ready(function() {
 							strStockProcessed += field[i].symbol;
 							strStockProcessed += ", ";
 							messageProcessedStocks.innerHTML = strStockProcessed;
+							processedStocks += 1
 							messageProcessedStocksStats.innerHTML = "Total stocks: " + totalStocks + " Processed: " + processedStocks
 							openPage(field[i].symbol)
-							processedStocks += 1
 							if (processedStocks % stocksToOpenPerClick == 0) {
 								debugger
 								break;
