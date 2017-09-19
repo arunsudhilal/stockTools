@@ -21,27 +21,15 @@ $(document).ready(function(){
 				totalStocks = totalStocks - 1
 				processedStocks = processedStocks + 1
 				if(processedStocks % 5 == 0)
-					break;			
+					break;
 				debugger
 			}
 			debugger
 		}
 		//if Fetch button is pressed
 		if (buttonID == "2") {
-			var req = new XMLHttpRequest();
-
-			req.open('GET', 'http://www.google.com', false);
-			req.send(null);
-
-			if(req.status == 200) {
-				alert(req.responseText);
-			}
-			debugger
-			$.get("http://json.bselivefeeds.indiatimes.com/ET_Community/Near52WeeksHigh?callback=jQuery111303796357068496068_1499585248089&pagesize=100&pid=7&exchange=50&pageno=1&sortby=percentgap&sortorder=asc", function(data){
-				//alert("Data: " + data + "\nStatus: " + status);
-				debugger
-				alert("Arun")
-			});
+			dataJson = dataJson.split("jQuery111303796357068496068_1499585248089(", 2)[1];
+			dataJson = dataJson.split(')', 1);
 			debugger
 			
 		}
