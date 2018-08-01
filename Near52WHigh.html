@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>52 Week Near</title>
+	</head>
+
+	<body>
+		<div>
+			<button id="fetch">Fetch from server</button>
+			<button id="openCharts">Open Charts</button>
+		</div>
+		<section>
+
+		</section>
+	</body>
+
+	<script>
+		/* Reference
+			https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON
+		*/
+		var fetchBtn = document.getElementById("fetch");
+		var openChartBtn = document.getElementById("openCharts");
+		var requestURL = 'http://json.bselivefeeds.indiatimes.com/ET_Community/Near52WeeksHigh?callback=jQuery111303796357068496068_1499585248089&pagesize=50&pid=7&exchange=50&pageno=1&sortby=percentgap&sortorder=asc'
+		var request = new XMLHttpRequest();
+		var section = document.querySelector('section');
+		var jsonStocks;
+
+		var pendingStocks,processedStocks;
+
+		request.open('GET', requestURL);
+		request.responseType = 'text';
+		request.send();
+
+		fetchBtn.onclick = function() {
+			alert('fetch button');
+		}
+
+		openChartBtn.onclick = function() {
+			var stockList = document.createElement('stockList');
+			alert('open chart button');
+			console.log('pendingStocks', pendingStocks);
+			console.log('processedStocks', processedStocks);
+			while(pendingStocks > 0) {
+				var stockName = document.createElement('stockName');
+				stockName.textContent = jsonStocks[processedStocks]["ticker"];
+				console.log(stockName)
+				openPage(stockName.textContent);
+				stockList.appendChild(stockName);
+				processedStocks = processedStocks + 1;
+				pendingStocks = pendingStocks - 1;
+				if (processedStocks % 5 == 0) {
+					break;
+				}
+				console.log('inside pendingStocks', pendingStocks);
+			}
+			console.log('exited while');
+			section.appendChild(stockList);
+//			alert(jsonStocks[0]["ticker"]);
+//			alert(jsonStocks[1]["ticker"]);
+		}
+
+		request.onload = function() {
+			var res = request.response.replace("jQuery111303796357068496068_1499585248089(", "")
+			res = res.replace("})", "}");
+//			alert(res);
+//			console.log(res);
+			var jsonResponse = JSON.parse(res);
+			jsonResponse = jsonResponse["searchresult"];
+			jsonStocks = jsonResponse
+			console.log(jsonResponse);
+			console.log(jsonResponse[0]["ticker"]);
+			console.log(jsonResponse[1]["ticker"]);
+			console.log(jsonResponse[2]["ticker"]);
+			console.log(jsonResponse[3]["ticker"]);
+			pendingStocks = jsonStocks.length;
+			processedStocks = 0;
+		}
+
+		function openPage(stock) {
+			var text = "http://chartink.com/stocks/" + stock + ".html";
+			console.log(text);
+			window.open(text); 
+		}
+	</script>
+</html>
