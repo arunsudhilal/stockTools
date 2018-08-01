@@ -30,25 +30,29 @@
 		var jsonStocks;
 		var pendingStocks,processedStocks;
 
-		request.open('GET', requestURL);
-		request.responseType = 'text';
-		request.send();
 
 		fetchBtn.onclick = function() {
-			alert('fetch button - currently empty');
-		}
+			request.open('GET', requestURL);
+			request.responseType = 'text';
+			request.send();
 
-		function individualChart() {
-			alert('open chart');
+			request.onload = function() {
+				var res = request.response.replace("jQuery111303796357068496068_1499585248089(", "")
+				res = res.replace("})", "}");
+				var jsonResponse = JSON.parse(res);
+				jsonResponse = jsonResponse["searchresult"];
+				jsonStocks = jsonResponse
+				console.log(jsonResponse);
+				pendingStocks = jsonStocks.length;
+				processedStocks = 0;
+			}
 		}
 
 		openChartBtn.onclick = function() {
 			var stockListS1 = document.createElement('stockList');
 			var myArticle = document.createElement('article');
-			var myStockName = document.createElement('ul');
 			var sec2 = document.getElementById("stockDetailsSection");
 
-//			alert('open chart button');
 			console.log('pendingStocks', pendingStocks);
 			console.log('processedStocks', processedStocks);
 			while(pendingStocks > 0) {
@@ -62,7 +66,6 @@
 				stockBtn.setAttribute("type", 'BUTTON');
 				stockBtn.setAttribute("name", 'chart');
 				stockBtn.setAttribute("value", 'chart');
-//				stockBtn.setAttribute("onclick", individualChart());
 				stockBtn.stockName = jsonStocks[processedStocks]["ticker"];
 
 				/*
@@ -70,16 +73,12 @@
 				 * refrence : http://www.howtocreate.co.uk/referencedvariables.html
 				 */
 				stockBtn.onclick = function() {
-//					alert('open single chart' + this.stockName);
 					openPage(this.stockName);
 				}
 
 				stockNameS1.textContent = jsonStocks[processedStocks]["ticker"] + " ";
 				stockNameS2.textContent = stockNameS1.textContent;
 				stockHigh.textContent = jsonStocks[processedStocks]["high"] + " ";
-//				console.log(stockName)
-//				myStockName.textContent= stockName.textContent;
-				//openPage(stockName.textContent);
 				stockListS1.appendChild(stockNameS1);
 				listItem.appendChild(stockNameS2)
 				listItem.appendChild(stockHigh);
@@ -93,26 +92,15 @@
 				console.log('inside pendingStocks', pendingStocks);
 			}
 			console.log('exited while');
-			//myArticle.appendChild(myStockName);
 			sec1.appendChild(stockListS1);
 			sec2.appendChild(myArticle);
 		}
 
-		request.onload = function() {
-			var res = request.response.replace("jQuery111303796357068496068_1499585248089(", "")
-			res = res.replace("})", "}");
-			var jsonResponse = JSON.parse(res);
-			jsonResponse = jsonResponse["searchresult"];
-			jsonStocks = jsonResponse
-			console.log(jsonResponse);
-			pendingStocks = jsonStocks.length;
-			processedStocks = 0;
-		}
 
 		function openPage(stock) {
 			var text = "http://chartink.com/stocks/" + stock + ".html";
 			console.log(text);
-			window.open(text); 
+			window.open(text);
 		}
 	</script>
 </html>
