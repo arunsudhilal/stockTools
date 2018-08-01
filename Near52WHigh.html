@@ -13,6 +13,9 @@
 		<section>
 
 		</section>
+
+		<section id="stockDetailsSection">
+		</section>
 	</body>
 
 	<script>
@@ -23,9 +26,8 @@
 		var openChartBtn = document.getElementById("openCharts");
 		var requestURL = 'http://json.bselivefeeds.indiatimes.com/ET_Community/Near52WeeksHigh?callback=jQuery111303796357068496068_1499585248089&pagesize=50&pid=7&exchange=50&pageno=1&sortby=percentgap&sortorder=asc'
 		var request = new XMLHttpRequest();
-		var section = document.querySelector('section');
+		var sec1 = document.querySelector('section');
 		var jsonStocks;
-
 		var pendingStocks,processedStocks;
 
 		request.open('GET', requestURL);
@@ -33,46 +35,76 @@
 		request.send();
 
 		fetchBtn.onclick = function() {
-			alert('fetch button');
+			alert('fetch button - currently empty');
+		}
+
+		function individualChart() {
+			alert('open chart');
 		}
 
 		openChartBtn.onclick = function() {
-			var stockList = document.createElement('stockList');
-			alert('open chart button');
+			var stockListS1 = document.createElement('stockList');
+			var myArticle = document.createElement('article');
+			var myStockName = document.createElement('ul');
+			var sec2 = document.getElementById("stockDetailsSection");
+
+//			alert('open chart button');
 			console.log('pendingStocks', pendingStocks);
 			console.log('processedStocks', processedStocks);
 			while(pendingStocks > 0) {
-				var stockName = document.createElement('stockName');
-				stockName.textContent = jsonStocks[processedStocks]["ticker"];
-				console.log(stockName)
-				openPage(stockName.textContent);
-				stockList.appendChild(stockName);
+				var listItem = document.createElement('li');
+				var stockNameS1 = document.createElement('stockName');
+				var stockNameS2 = document.createElement('stockName');
+				var stockHigh = document.createElement('stockHigh');
+				var stockBtn = document.createElement("input");
+
+				stockBtn.setAttribute("style","color:red;font-size:23px");
+				stockBtn.setAttribute("type", 'BUTTON');
+				stockBtn.setAttribute("name", 'chart');
+				stockBtn.setAttribute("value", 'chart');
+//				stockBtn.setAttribute("onclick", individualChart());
+				stockBtn.stockName = jsonStocks[processedStocks]["ticker"];
+
+				/*
+				 * Passing variable to function
+				 * refrence : http://www.howtocreate.co.uk/referencedvariables.html
+				 */
+				stockBtn.onclick = function() {
+//					alert('open single chart' + this.stockName);
+					openPage(this.stockName);
+				}
+
+				stockNameS1.textContent = jsonStocks[processedStocks]["ticker"] + " ";
+				stockNameS2.textContent = stockNameS1.textContent;
+				stockHigh.textContent = jsonStocks[processedStocks]["high"] + " ";
+//				console.log(stockName)
+//				myStockName.textContent= stockName.textContent;
+				//openPage(stockName.textContent);
+				stockListS1.appendChild(stockNameS1);
+				listItem.appendChild(stockNameS2)
+				listItem.appendChild(stockHigh);
+				listItem.appendChild(stockBtn);
 				processedStocks = processedStocks + 1;
 				pendingStocks = pendingStocks - 1;
+				myArticle.appendChild(listItem);
 				if (processedStocks % 5 == 0) {
 					break;
 				}
 				console.log('inside pendingStocks', pendingStocks);
 			}
 			console.log('exited while');
-			section.appendChild(stockList);
-//			alert(jsonStocks[0]["ticker"]);
-//			alert(jsonStocks[1]["ticker"]);
+			//myArticle.appendChild(myStockName);
+			sec1.appendChild(stockListS1);
+			sec2.appendChild(myArticle);
 		}
 
 		request.onload = function() {
 			var res = request.response.replace("jQuery111303796357068496068_1499585248089(", "")
 			res = res.replace("})", "}");
-//			alert(res);
-//			console.log(res);
 			var jsonResponse = JSON.parse(res);
 			jsonResponse = jsonResponse["searchresult"];
 			jsonStocks = jsonResponse
 			console.log(jsonResponse);
-			console.log(jsonResponse[0]["ticker"]);
-			console.log(jsonResponse[1]["ticker"]);
-			console.log(jsonResponse[2]["ticker"]);
-			console.log(jsonResponse[3]["ticker"]);
 			pendingStocks = jsonStocks.length;
 			processedStocks = 0;
 		}
