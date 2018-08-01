@@ -24,18 +24,25 @@
 		*/
 		var fetchBtn = document.getElementById("fetch");
 		var openChartBtn = document.getElementById("openCharts");
-		var requestURL = 'http://json.bselivefeeds.indiatimes.com/ET_Community/Near52WeeksHigh?callback=jQuery111303796357068496068_1499585248089&pagesize=50&pid=7&exchange=50&pageno=1&sortby=percentgap&sortorder=asc'
-		var request = new XMLHttpRequest();
 		var sec1 = document.querySelector('section');
 		var jsonStocks;
 		var pendingStocks,processedStocks;
 
-
 		fetchBtn.onclick = function() {
+			var requestURL = 'http://json.bselivefeeds.indiatimes.com/ET_Community/Near52WeeksHigh?callback=jQuery111303796357068496068_1499585248089&pagesize=50&pid=7&exchange=50&pageno=1&sortby=percentgap&sortorder=asc'
+			var request = new XMLHttpRequest();
+			var totalStocks;
 			request.open('GET', requestURL);
 			request.responseType = 'text';
 			request.send();
 
+			function cleanPage() {
+				var sec1 = document.querySelector('section');
+				var sec2 = document.getElementById("stockDetailsSection");
+				sec1.innerHTML = "";
+				sec2.innerHTML = "";
+
+			}
 			request.onload = function() {
 				var res = request.response.replace("jQuery111303796357068496068_1499585248089(", "")
 				res = res.replace("})", "}");
@@ -44,58 +51,63 @@
 				jsonStocks = jsonResponse
 				console.log(jsonResponse);
 				pendingStocks = jsonStocks.length;
+				console.log('pendingStocks' + pendingStocks);
+				processedStocks = 0;
+
+				var stockListS1 = document.createElement('stockList');
+				var myArticle = document.createElement('article');
+				var sec2 = document.getElementById("stockDetailsSection");
+				totalStocks = pendingStocks;
+
+				console.log("Totalstocks" + totalStocks);
+				cleanPage();
+				while (totalStocks > 0) {
+					var listItem = document.createElement('li');
+					var stockNameS1 = document.createElement('stockName');
+					var stockNameS2 = document.createElement('stockName');
+					var stockHigh = document.createElement('stockHigh');
+					var stockBtn = document.createElement("input");
+
+					stockBtn.setAttribute("style","color:red;font-size:23px");
+					stockBtn.setAttribute("type", 'BUTTON');
+					stockBtn.setAttribute("name", 'chart');
+					stockBtn.setAttribute("value", 'chart');
+					stockBtn.stockName = jsonStocks[processedStocks]["ticker"];
+					/*
+					 * Passing variable to function
+					 * refrence : http://www.howtocreate.co.uk/referencedvariables.html
+					 */
+					stockBtn.onclick = function() {
+						openPage(this.stockName);
+					}
+					stockNameS1.textContent = jsonStocks[processedStocks]["ticker"] + " ";
+					stockNameS2.textContent = stockNameS1.textContent;
+					stockHigh.textContent = jsonStocks[processedStocks]["high"] + " ";
+					stockListS1.appendChild(stockNameS1);
+					listItem.appendChild(stockNameS2)
+					listItem.appendChild(stockHigh);
+					listItem.appendChild(stockBtn);
+					myArticle.appendChild(listItem);
+					totalStocks -= 1;
+					processedStocks += 1;
+				}
+				sec1.appendChild(stockListS1);
+				sec2.appendChild(myArticle);
 				processedStocks = 0;
 			}
 		}
 
 		openChartBtn.onclick = function() {
-			var stockListS1 = document.createElement('stockList');
-			var myArticle = document.createElement('article');
-			var sec2 = document.getElementById("stockDetailsSection");
 
-			console.log('pendingStocks', pendingStocks);
-			console.log('processedStocks', processedStocks);
 			while(pendingStocks > 0) {
-				var listItem = document.createElement('li');
-				var stockNameS1 = document.createElement('stockName');
-				var stockNameS2 = document.createElement('stockName');
-				var stockHigh = document.createElement('stockHigh');
-				var stockBtn = document.createElement("input");
-
-				stockBtn.setAttribute("style","color:red;font-size:23px");
-				stockBtn.setAttribute("type", 'BUTTON');
-				stockBtn.setAttribute("name", 'chart');
-				stockBtn.setAttribute("value", 'chart');
-				stockBtn.stockName = jsonStocks[processedStocks]["ticker"];
-
-				/*
-				 * Passing variable to function
-				 * refrence : http://www.howtocreate.co.uk/referencedvariables.html
-				 */
-				stockBtn.onclick = function() {
-					openPage(this.stockName);
-				}
-
-				stockNameS1.textContent = jsonStocks[processedStocks]["ticker"] + " ";
-				stockNameS2.textContent = stockNameS1.textContent;
-				stockHigh.textContent = jsonStocks[processedStocks]["high"] + " ";
-				stockListS1.appendChild(stockNameS1);
-				listItem.appendChild(stockNameS2)
-				listItem.appendChild(stockHigh);
-				listItem.appendChild(stockBtn);
-				processedStocks = processedStocks + 1;
+				openPage(jsonStocks[processedStocks]["ticker"]);
 				pendingStocks = pendingStocks - 1;
-				myArticle.appendChild(listItem);
-				if (processedStocks % 5 == 0) {
-					break;
-				}
+				processedStocks = processedStocks + 1;
 				console.log('inside pendingStocks', pendingStocks);
+				if (processedStocks % 5 == 0)
+					break;
 			}
-			console.log('exited while');
-			sec1.appendChild(stockListS1);
-			sec2.appendChild(myArticle);
 		}
-
 
 		function openPage(stock) {
 			var text = "http://chartink.com/stocks/" + stock + ".html";
