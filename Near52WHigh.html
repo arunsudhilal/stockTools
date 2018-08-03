@@ -3,6 +3,9 @@
 	<head>
 		<meta charset="utf-8">
 		<title>52 Week Near</title>
+		<link href="https://fonts.googleapis.com/css?family=Faster+One" rel="stylesheet">
+		<link rel="stylesheet" href="style.css">
+
 	</head>
 
 	<body>
@@ -13,6 +16,10 @@
 		<section>
 
 		</section>
+
+		<header>
+
+		</header>
 
 		<section id="stockDetailsSection">
 		</section>
@@ -25,6 +32,7 @@
 		var fetchBtn = document.getElementById("fetch");
 		var openChartBtn = document.getElementById("openCharts");
 		var sec1 = document.querySelector('section');
+		var header = document.querySelector('header');
 		var jsonStocks;
 		var pendingStocks,processedStocks;
 
@@ -34,47 +42,6 @@
 			request.open('GET', requestURL);
 			request.responseType = 'text';
 			request.send();
-
-			function cleanPage() {
-				var sec1 = document.querySelector('section');
-				var sec2 = document.getElementById("stockDetailsSection");
-				sec1.innerHTML = "";
-				sec2.innerHTML = "";
-			}
-
-			function populateStockEntries() {
-				var sec2 = document.getElementById("stockDetailsSection");
-				var myArticle = document.createElement('article');
-				var index = 0;
-				while (index < jsonStocks.length ) {
-					var listItem = document.createElement('li');
-					var stockName = document.createElement('stockName');
-					var stockHigh = document.createElement('stockHigh');
-					var stockBtn = document.createElement("input");
-
-					stockBtn.setAttribute("style","color:red;font-size:23px");
-					stockBtn.setAttribute("type", 'BUTTON');
-					stockBtn.setAttribute("name", 'chart');
-					stockBtn.setAttribute("value", 'chart');
-					stockBtn.stockName = jsonStocks[index]["ticker"];
-					/*
-					 * Passing variable to function
-					 * refrence : http://www.howtocreate.co.uk/referencedvariables.html
-					 */
-					stockBtn.onclick = function() {
-						openPage(this.stockName);
-					}
-					stockName.textContent = jsonStocks[index]["ticker"] + " ";
-					stockHigh.textContent = jsonStocks[index]["high"] + " ";
-					listItem.appendChild(stockName);
-					listItem.appendChild(stockHigh);
-					listItem.appendChild(stockBtn);
-					myArticle.appendChild(listItem);
-					index += 1;
-				}
-//				sec1.appendChild(stockListS1);
-				sec2.appendChild(myArticle);
-			}
 
 			request.onload = function() {
 				var res = request.response.replace("jQuery111303796357068496068_1499585248089(", "")
@@ -86,8 +53,76 @@
 				/* re-initillize processed and pending stock for openChart button */
 				processedStocks = 0;
 				pendingStocks = jsonStocks.length;
+				populateHeader();
 				populateStockEntries();
 			}
+
+			function cleanPage() {
+				var sec1 = document.querySelector('section');
+				var sec2 = document.getElementById("stockDetailsSection");
+				sec1.innerHTML = "";
+				sec2.innerHTML = "";
+				header.innerHTML = "";
+			}
+
+			function populateHeader() {
+				function headerEntry(value) {
+					var listHeader = document.createElement('span');
+					listHeader.textContent = value;
+					header.appendChild(listHeader);
+				}
+				headerEntry('stock Name');
+				headerEntry('High');
+			}
+
+			function createStockEntry(index) {
+				var sec2 = document.querySelector("#stockDetailsSection");
+				var parentDiv = document.createElement('div');
+				var stockName = document.createElement('div');
+				var stockHigh = document.createElement('div');
+				var stockBtn = document.createElement("input");
+
+				parentDiv.style.width= '500px';
+				parentDiv.style.height = '50px';
+				parentDiv.style.border= '1px solid red';
+				parentDiv.style.margin = '10px';
+
+				stockName.style.width = '130px';
+				stockName.textContent = jsonStocks[index]["ticker"] + " ";
+				stockName.style.float = 'left';
+
+				stockHigh.textContent = jsonStocks[index]["high"] + " ";
+				stockHigh.style.float = 'left';
+
+				stockBtn.setAttribute("style","color:red;font-size:23px");
+				stockBtn.setAttribute("type", 'BUTTON');
+				stockBtn.setAttribute("name", 'chart');
+				stockBtn.setAttribute("value", 'chart');
+				stockBtn.stockName = jsonStocks[index]["ticker"];
+				stockBtn.style.float = 'right';
+				/*
+				 * Passing variable to function
+				 * refrence : http://www.howtocreate.co.uk/referencedvariables.html
+				 */
+				stockBtn.onclick = function() {
+					openPage(this.stockName);
+				}
+
+				parentDiv.appendChild(stockName);
+				parentDiv.appendChild(stockHigh);
+				parentDiv.appendChild(stockBtn);
+				parentDiv.style.display = 'block';
+				sec2.appendChild(parentDiv);
+			}
+
+			function populateStockEntries() {
+				var index = 0;
+				while (index < jsonStocks.length ) {
+					createStockEntry(index);
+					index += 1;
+				}
+			}
+
 		}
 
 		openChartBtn.onclick = function() {
