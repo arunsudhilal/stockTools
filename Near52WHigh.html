@@ -17,9 +17,9 @@
 
 		</section>
 
-		<header>
+		<section id="stockHeader">
 
-		</header>
+		</section>
 
 		<section id="stockDetailsSection">
 		</section>
@@ -32,7 +32,7 @@
 		var fetchBtn = document.getElementById("fetch");
 		var openChartBtn = document.getElementById("openCharts");
 		var sec1 = document.querySelector('section');
-		var header = document.querySelector('header');
+		var sectionHeader = document.querySelector("#stockHeader");
 		var jsonStocks;
 		var pendingStocks,processedStocks;
 
@@ -62,37 +62,50 @@
 				var sec2 = document.getElementById("stockDetailsSection");
 				sec1.innerHTML = "";
 				sec2.innerHTML = "";
-				header.innerHTML = "";
+				sectionHeader.innerHTML = "";
+			}
+
+			function initStyleDiv(item, content) {
+				item.style.width = '100px';
+				item.style.float = 'left';
+				item.textContent = content;
 			}
 
 			function populateHeader() {
-				function headerEntry(value) {
-					var listHeader = document.createElement('span');
-					listHeader.textContent = value;
-					header.appendChild(listHeader);
-				}
-				headerEntry('stock Name');
-				headerEntry('High');
+				var parentDiv = document.createElement('div');
+				var stockName = document.createElement('div');
+				var stock52WH = document.createElement('div');
+				var stockHigh = document.createElement('div');
+
+				parentDiv.style.width= '1000px';
+				parentDiv.style.height = '50px';
+				parentDiv.style.border= '1px solid red';
+
+				initStyleDiv(stockName, "stock Name");
+				initStyleDiv(stock52WH, "52 W High");;
+				initStyleDiv(stockHigh, "Stock High");;
+
+				parentDiv.appendChild(stockName);
+				parentDiv.appendChild(stock52WH);
+				parentDiv.appendChild(stockHigh);
+				sectionHeader.appendChild(parentDiv);
 			}
 
 			function createStockEntry(index) {
 				var sec2 = document.querySelector("#stockDetailsSection");
 				var parentDiv = document.createElement('div');
 				var stockName = document.createElement('div');
+				var stock52WH = document.createElement('div');
 				var stockHigh = document.createElement('div');
 				var stockBtn = document.createElement("input");
 
-				parentDiv.style.width= '500px';
+				parentDiv.style.width= '1000px';
 				parentDiv.style.height = '50px';
 				parentDiv.style.border= '1px solid red';
-				parentDiv.style.margin = '10px';
 
-				stockName.style.width = '130px';
-				stockName.textContent = jsonStocks[index]["ticker"] + " ";
-				stockName.style.float = 'left';
-
-				stockHigh.textContent = jsonStocks[index]["high"] + " ";
-				stockHigh.style.float = 'left';
+				initStyleDiv(stockName, jsonStocks[index]["ticker"] + " ");
+				initStyleDiv(stock52WH, jsonStocks[index]["fiftyTwoWeekHighPrice"] + " ");
+				initStyleDiv(stockHigh, jsonStocks[index]["high"] + " ");
 
 				stockBtn.setAttribute("style","color:red;font-size:23px");
 				stockBtn.setAttribute("type", 'BUTTON');
@@ -109,6 +122,7 @@
 				}
 
 				parentDiv.appendChild(stockName);
+				parentDiv.appendChild(stock52WH);
 				parentDiv.appendChild(stockHigh);
 				parentDiv.appendChild(stockBtn);
 				parentDiv.style.display = 'block';
@@ -125,6 +139,7 @@
 
 		}
 
+		fetchBtn.onclick();
 		openChartBtn.onclick = function() {
 			while(pendingStocks > 0) {
 				openPage(jsonStocks[processedStocks]["ticker"]);
