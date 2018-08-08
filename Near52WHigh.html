@@ -76,6 +76,7 @@
 				var stockName = document.createElement('div');
 				var stock52WH = document.createElement('div');
 				var stockHigh = document.createElement('div');
+				var marketCap = document.createElement('div');
 
 				parentDiv.style.width= '1000px';
 				parentDiv.style.height = '50px';
@@ -84,10 +85,12 @@
 				initStyleDiv(stockName, "stock Name");
 				initStyleDiv(stock52WH, "52 W High");;
 				initStyleDiv(stockHigh, "Stock High");;
+				initStyleDiv(marketCap, "Market Cap(in Cr)");;
 
 				parentDiv.appendChild(stockName);
 				parentDiv.appendChild(stock52WH);
 				parentDiv.appendChild(stockHigh);
+				parentDiv.appendChild(marketCap);
 				sectionHeader.appendChild(parentDiv);
 			}
 
@@ -97,6 +100,7 @@
 				var stockName = document.createElement('div');
 				var stock52WH = document.createElement('div');
 				var stockHigh = document.createElement('div');
+				var marketCap = document.createElement('div');
 				var stockBtn = document.createElement("input");
 
 				parentDiv.style.width= '1000px';
@@ -106,6 +110,11 @@
 				initStyleDiv(stockName, jsonStocks[index]["ticker"] + " ");
 				initStyleDiv(stock52WH, jsonStocks[index]["fiftyTwoWeekHighPrice"] + " ");
 				initStyleDiv(stockHigh, jsonStocks[index]["high"] + " ");
+				var inCr = parseFloat(jsonStocks[index]["marketCap"]);
+				inCr = inCr / 10000000;
+				console.log("inCr: " + inCr);
+				inCr = inCr.toFixed(0);
+				initStyleDiv(marketCap, inCr.toString() + " ");
 
 				stockBtn.setAttribute("style","color:red;font-size:23px");
 				stockBtn.setAttribute("type", 'BUTTON');
@@ -124,6 +133,7 @@
 				parentDiv.appendChild(stockName);
 				parentDiv.appendChild(stock52WH);
 				parentDiv.appendChild(stockHigh);
+				parentDiv.appendChild(marketCap);
 				parentDiv.appendChild(stockBtn);
 				parentDiv.style.display = 'block';
 				sec2.appendChild(parentDiv);
