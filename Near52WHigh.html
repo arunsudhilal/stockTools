@@ -83,9 +83,9 @@
 				parentDiv.style.border= '1px solid red';
 
 				initStyleDiv(stockName, "stock Name");
-				initStyleDiv(stock52WH, "52 W High");;
-				initStyleDiv(stockHigh, "Stock High");;
-				initStyleDiv(marketCap, "Market Cap(in Cr)");;
+				initStyleDiv(stock52WH, "52 W High");
+				initStyleDiv(stockHigh, "Stock High");
+				initStyleDiv(marketCap, "Mkt Cap(in Cr)");
 
 				parentDiv.appendChild(stockName);
 				parentDiv.appendChild(stock52WH);
@@ -106,6 +106,10 @@
 				parentDiv.style.width= '1000px';
 				parentDiv.style.height = '50px';
 				parentDiv.style.border= '1px solid red';
+				if (index%2)
+					parentDiv.className = 'evennum';
+				else
+					parentDiv.className = 'oddnum';
 
 				initStyleDiv(stockName, jsonStocks[index]["ticker"] + " ");
 				initStyleDiv(stock52WH, jsonStocks[index]["fiftyTwoWeekHighPrice"] + " ");
@@ -167,4 +171,27 @@
 			window.open(text);
 		}
 	</script>
+
+<style>
+
+	button {
+	 margin : 10px
+	}
+	input{
+	 margin : 10px
+	}
+
+	div {
+	 margin : 10px
+	}
+
+	.oddnum {
+	  background-color: #ccc;
+	}
+
+	.evennum {
+	  background-color: #eee;
+	}
+
+</style>
 </html>
