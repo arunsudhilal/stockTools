@@ -65,9 +65,9 @@
 				sectionHeader.innerHTML = "";
 			}
 
-			function initStyleDiv(content) {
+			function initStyleDiv(content, pixel) {
 				var item = document.createElement('div');
-				item.style.width = '100px';
+				item.style.width = pixel;
 				item.style.float = 'left';
 				item.textContent = content;
 				return item;
@@ -81,11 +81,12 @@
 				parentDiv.style.height = '50px';
 				parentDiv.style.border= '1px solid red';
 
-				parentDiv.appendChild(initStyleDiv("stock Name"));
-				parentDiv.appendChild(initStyleDiv("52 W High"));
-				parentDiv.appendChild(initStyleDiv("Stock High"));
-				parentDiv.appendChild(initStyleDiv("Mkt Cap(in Cr)"));
-				parentDiv.appendChild(initStyleDiv("Sector"));
+				parentDiv.appendChild(initStyleDiv("SL. No", '30px'));
+				parentDiv.appendChild(initStyleDiv("stock Name", '100px'));
+				parentDiv.appendChild(initStyleDiv("52 W High", '70px'));
+				parentDiv.appendChild(initStyleDiv("Day High", '70px'));
+				parentDiv.appendChild(initStyleDiv("Mkt Cap(in Cr)", '70px'));
+				parentDiv.appendChild(initStyleDiv("Sector", '100px'));
 				sectionHeader.appendChild(parentDiv);
 			}
 
@@ -102,15 +103,16 @@
 				else
 					parentDiv.className = 'oddnum';
 
-				parentDiv.appendChild(initStyleDiv(jsonStocks[index]["ticker"] + " "));
-				parentDiv.appendChild(initStyleDiv(jsonStocks[index]["fiftyTwoWeekHighPrice"] + " "));
-				parentDiv.appendChild(initStyleDiv(jsonStocks[index]["high"] + " "));
+				parentDiv.appendChild(initStyleDiv(index +1, '30px'));
+				parentDiv.appendChild(initStyleDiv(jsonStocks[index]["ticker"] + " ", '100px'));
+				parentDiv.appendChild(initStyleDiv(jsonStocks[index]["fiftyTwoWeekHighPrice"] + " ", '70px'));
+				parentDiv.appendChild(initStyleDiv(jsonStocks[index]["high"] + " ", '70px'));
 				var inCr = parseFloat(jsonStocks[index]["marketCap"]);
 				inCr = inCr / 10000000;
 				console.log("inCr: " + inCr);
 				inCr = inCr.toFixed(0);
-				parentDiv.appendChild(initStyleDiv(inCr.toString() + " "));
-				parentDiv.appendChild(initStyleDiv(jsonStocks[index]["sectorName"] + " "));
+				parentDiv.appendChild(initStyleDiv(inCr.toString() + " ", '70px'));
+				parentDiv.appendChild(initStyleDiv(jsonStocks[index]["sectorName"] + " ", '100px'));
 
 				stockBtn.setAttribute("style","color:red;font-size:23px");
 				stockBtn.setAttribute("type", 'BUTTON');
