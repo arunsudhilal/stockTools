@@ -20,7 +20,7 @@
 			<section id="stockDetailsSectionNear52WH">
 			</section>
 		</section>
-		<section id="new52WH" >
+		<section id="new52WH" class="right" >
 			<section id="stockHeaderNew52WH">
 			</section>
 
@@ -30,7 +30,9 @@
 
 	</body>
 <style>
+
 section.left{float:left; }
+section.right{float:right; }
 	button {
 	 margin : 10px
 	}
@@ -39,7 +41,7 @@ section.left{float:left; }
 	}
 
 	div {
-	 margin : 10px
+	 margin : 5px
 	}
 
 	.oddnum {
@@ -58,15 +60,18 @@ section.left{float:left; }
 		*/
 		var fetchBtn = document.getElementById("fetch");
 		var openChartBtn = document.getElementById("openCharts");
-		var sectionHeader = document.querySelector("#stockHeaderNear52WH");
-		var jsonStocks;
+		var sec_header_near = document.querySelector("#stockHeaderNear52WH");
+		var sec_header_new = document.querySelector("#stockHeaderNew52WH");
+		var sec_entries_near = document.querySelector("#stockDetailsSectionNear52WH");
+		var sec_entries_new = document.querySelector("#stockDetailsSectionNew52WH");
+		var jsonStocks, jsonStocksNSE;
 		var pendingStocks,processedStocks;
 
 		fetchBtn.onclick = function() {
 			var requestURL = 'http://json.bselivefeeds.indiatimes.com/ET_Community/Near52WeeksHigh?callback=jQuery111303796357068496068_1499585248089&pagesize=50&pid=7&exchange=50&pageno=1&sortby=percentgap&sortorder=asc'
 			var request = new XMLHttpRequest();
-			request.open('GET', requestURL, 'false');
 			request.responseType = 'text';
+			request.open('GET', requestURL);
 			request.send();
 
 			request.onload = function() {
@@ -79,14 +84,28 @@ section.left{float:left; }
 				/* re-initillize processed and pending stock for openChart button */
 				processedStocks = 0;
 				pendingStocks = jsonStocks.length;
-				populateHeader();
-				populateStockEntries();
+				populateHeaderNear52WH();
+				populateEntriesNear52WH();
+			}
+
+			var requestURLNSE = 'https://www.nseindia.com/products/dynaContent/equities/equities/json/online52NewHigh.json';
+			var request1 = new XMLHttpRequest();
+			request1.open('GET', requestURLNSE);
+			request1.responseType = 'json';
+			request1.send();
+
+			request1.onload = function() {
+				jsonStocksNSE = request1.response["data"];
+				console.log(jsonStocksNSE);
+				populateHeaderNew52WH();
+				populateEntriesNew52WH();
 			}
 
 			function cleanPage() {
-				var sectionNear52WH = document.getElementById("stockDetailsSectionNear52WH");
-				sectionNear52WH.innerHTML = "";
-				sectionHeader.innerHTML = "";
+				sec_header_near.innerHTML = "";
+				sec_header_new.innerHTML = "";
+				sec_entries_near.innerHTML = "";
+				sec_entries_new.innerHTML = "";
 			}
 
 			function initStyleDiv(content, pixel) {
@@ -97,11 +116,11 @@ section.left{float:left; }
 				return item;
 			}
 
-			function populateHeader() {
+			function populateHeaderNear52WH() {
 
 				var parentDiv = document.createElement('div');
 				var item;
-				parentDiv.style.width= '1000px';
+				parentDiv.style.width= '700px';
 				parentDiv.style.height = '50px';
 				parentDiv.style.border= '1px solid red';
 
@@ -109,17 +128,17 @@ section.left{float:left; }
 				parentDiv.appendChild(initStyleDiv("stock Name", '100px'));
 				parentDiv.appendChild(initStyleDiv("52 W High", '70px'));
 				parentDiv.appendChild(initStyleDiv("Day High", '70px'));
-				parentDiv.appendChild(initStyleDiv("Mkt Cap(in Cr)", '70px'));
+				parentDiv.appendChild(initStyleDiv("Market Cap (in Cr)", '80px'));
 				parentDiv.appendChild(initStyleDiv("Sector", '100px'));
-				sectionHeader.appendChild(parentDiv);
+				sec_header_near.appendChild(parentDiv);
 			}
 
-			function createStockEntry(index) {
-				var sectionNear52WH = document.querySelector("#stockDetailsSectionNear52WH");
+
+			function createNear52WHEntry(index) {
 				var parentDiv = document.createElement('div');
 				var stockBtn = document.createElement("input");
 
-				parentDiv.style.width= '1000px';
+				parentDiv.style.width= '700px';
 				parentDiv.style.height = '50px';
 				parentDiv.style.border= '1px solid red';
 				if (index%2)
@@ -154,17 +173,76 @@ section.left{float:left; }
 
 				parentDiv.appendChild(stockBtn);
 				parentDiv.style.display = 'block';
-				sectionNear52WH.appendChild(parentDiv);
+				sec_entries_near.appendChild(parentDiv);
 			}
 
-			function populateStockEntries() {
+			function populateHeaderNew52WH() {
+				var parentDiv = document.createElement('div');
+				var item;
+
+				parentDiv.style.width= '700px';
+				parentDiv.style.height = '50px';
+				parentDiv.style.border= '1px solid red';
+
+				parentDiv.appendChild(initStyleDiv("SL. No", '30px'));
+				parentDiv.appendChild(initStyleDiv("Stock Name", '100px'));
+				parentDiv.appendChild(initStyleDiv("New 52WH", '70px'));
+				parentDiv.appendChild(initStyleDiv("Prev 52WH", '70px'));
+				sec_header_new.appendChild(parentDiv);
+			}
+
+			function createNew52WHEntry(index) {
+				var parentDiv = document.createElement('div');
+				var stockBtn = document.createElement("input");
+
+				parentDiv.style.width= '700px';
+				parentDiv.style.height = '50px';
+				parentDiv.style.border= '1px solid red';
+
+				if (index%2)
+					parentDiv.className = 'evennum';
+				else
+					parentDiv.className = 'oddnum';
+
+				parentDiv.appendChild(initStyleDiv(index +1, '30px'));
+				parentDiv.appendChild(initStyleDiv(jsonStocksNSE[index]["symbol"] + " ", '100px'));
+				parentDiv.appendChild(initStyleDiv(jsonStocksNSE[index]["value"] + " ", '70px'));
+				parentDiv.appendChild(initStyleDiv(jsonStocksNSE[index]["value_old"] + " ", '70px'));
+
+				stockBtn.setAttribute("style","color:red;font-size:23px");
+				stockBtn.setAttribute("type", 'BUTTON');
+				stockBtn.setAttribute("name", 'chart');
+				stockBtn.setAttribute("value", 'chart');
+				stockBtn.stockName = jsonStocksNSE[index]["symbol"];
+				stockBtn.style.float = 'right';
+				/*
+				 * Passing variable to function
+				 * refrence : http://www.howtocreate.co.uk/referencedvariables.html
+				 */
+				stockBtn.onclick = function() {
+					openPage(this.stockName);
+				}
+
+				parentDiv.appendChild(stockBtn);
+				parentDiv.style.display = 'block';
+				sec_entries_new.appendChild(parentDiv);
+			}
+
+			function populateEntriesNear52WH() {
 				var index = 0;
 				while (index < jsonStocks.length ) {
-					createStockEntry(index);
+					createNear52WHEntry(index);
 					index += 1;
 				}
 			}
 
+			function populateEntriesNew52WH() {
+				var index = 0;
+				while (index < jsonStocksNSE.length ) {
+					createNew52WHEntry(index);
+					index +=1;
+				}
+			}
 		}
 
 		fetchBtn.onclick();
