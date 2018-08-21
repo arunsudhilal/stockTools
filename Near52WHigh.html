@@ -12,6 +12,7 @@
 		<div>
 			<button id="fetch">Fetch from server</button>
 			<button id="openCharts">Open Charts</button>
+			<button id="openChartsNew52WH">Open Charts New 52WH </button>
 		</div>
 		<section id="near52WH" class="left">
 			<section id="stockHeaderNear52WH">
@@ -33,6 +34,9 @@
 
 section.left{float:left; }
 section.right{float:right; }
+	#openChartsNew52WH {
+		float : right
+	}
 	button {
 	 margin : 10px
 	}
@@ -60,12 +64,14 @@ section.right{float:right; }
 		*/
 		var fetchBtn = document.getElementById("fetch");
 		var openChartBtn = document.getElementById("openCharts");
+		var openChartNew52WHBtn = document.getElementById("openChartsNew52WH");
 		var sec_header_near = document.querySelector("#stockHeaderNear52WH");
 		var sec_header_new = document.querySelector("#stockHeaderNew52WH");
 		var sec_entries_near = document.querySelector("#stockDetailsSectionNear52WH");
 		var sec_entries_new = document.querySelector("#stockDetailsSectionNew52WH");
 		var jsonStocks, jsonStocksNSE;
 		var pendingStocks,processedStocks;
+		var pendingStocksNew52WH, processedStocksNew52WH;
 
 		fetchBtn.onclick = function() {
 			var requestURL = 'http://json.bselivefeeds.indiatimes.com/ET_Community/Near52WeeksHigh?callback=jQuery111303796357068496068_1499585248089&pagesize=50&pid=7&exchange=50&pageno=1&sortby=percentgap&sortorder=asc'
@@ -97,6 +103,8 @@ section.right{float:right; }
 			request1.onload = function() {
 				jsonStocksNSE = request1.response["data"];
 				console.log(jsonStocksNSE);
+				pendingStocksNew52WH = jsonStocksNSE.length;
+				processedStocksNew52WH = 0;
 				populateHeaderNew52WH();
 				populateEntriesNew52WH();
 			}
@@ -253,6 +261,16 @@ section.right{float:right; }
 				processedStocks += 1;
 				console.log('inside pendingStocks', pendingStocks);
 				if (processedStocks % 5 == 0)
+					break;
+			}
+		}
+
+		openChartNew52WHBtn.onclick = function() {
+			while (pendingStocksNew52WH > 0 ) {
+				openPage(jsonStocksNSE[processedStocksNew52WH]["symbol"]);
+				pendingStocksNew52WH -= 1;
+				processedStocksNew52WH += 1;
+				if (processedStocksNew52WH % 5 == 0)
 					break;
 			}
 		}
