@@ -69,9 +69,10 @@ section.right{float:right; }
 		var sec_header_new = document.querySelector("#stockHeaderNew52WH");
 		var sec_entries_near = document.querySelector("#stockDetailsSectionNear52WH");
 		var sec_entries_new = document.querySelector("#stockDetailsSectionNew52WH");
-		var jsonStocks, jsonStocksNSE;
+		var jsonStocks, jsonStocksNSE, recentJsonStocksNSE;
 		var pendingStocks,processedStocks;
 		var pendingStocksNew52WH, processedStocksNew52WH;
+		var fetchBtnFirstTime = 1;
 
 		fetchBtn.onclick = function() {
 			var requestURL = 'http://json.bselivefeeds.indiatimes.com/ET_Community/Near52WeeksHigh?callback=jQuery111303796357068496068_1499585248089&pagesize=50&pid=7&exchange=50&pageno=1&sortby=percentgap&sortorder=asc'
@@ -94,6 +95,30 @@ section.right{float:right; }
 				populateEntriesNear52WH();
 			}
 
+
+			function isInArray(symbl, array) {
+				var i;
+				for (i = 0 ; i < array.length ; i++) {
+					if(array[i]['symbol'] == symbl)
+						return true;
+				}
+			}
+
+			function filterRecent(old, recent) {
+				var result = [];
+				var index = 0;
+				var j;
+				for(j = 0 ; j < recent.length ; j++) {
+					//console.log(j, recent[j]["symbol"]);
+					if(!isInArray(recent[j]["symbol"], old)) {
+						console.log(recent[j]["symbol"], " not inside");
+						result[index++] = j
+					//	console.log(result)
+					}
+				}
+				return result;
+			}
+
 			var requestURLNSE = 'https://www.nseindia.com/products/dynaContent/equities/equities/json/online52NewHigh.json';
 			var request1 = new XMLHttpRequest();
 			request1.open('GET', requestURLNSE);
@@ -101,10 +126,18 @@ section.right{float:right; }
 			request1.send();
 
 			request1.onload = function() {
-				jsonStocksNSE = request1.response["data"];
-				console.log(jsonStocksNSE);
-				pendingStocksNew52WH = jsonStocksNSE.length;
-				processedStocksNew52WH = 0;
+				var diff;
+				if (fetchBtnFirstTime) {
+					fetchBtnFirstTime = 0;
+					jsonStocksNSE = request1.response["data"];
+					console.log(jsonStocksNSE);
+					pendingStocksNew52WH = jsonStocksNSE.length;
+					processedStocksNew52WH = 0;
+				} else {
+					recentJsonStocksNSE = request1.response["data"];
+					diff = filterRecent(jsonStocksNSE, recentJsonStocksNSE);
+					populateRecentNew52WH(diff);
+				}
 				populateHeaderNew52WH();
 				populateEntriesNew52WH();
 			}
@@ -160,7 +193,6 @@ section.right{float:right; }
 				parentDiv.appendChild(initStyleDiv(jsonStocks[index]["high"] + " ", '70px'));
 				var inCr = parseFloat(jsonStocks[index]["marketCap"]);
 				inCr = inCr / 10000000;
-				console.log("inCr: " + inCr);
 				inCr = inCr.toFixed(0);
 				parentDiv.appendChild(initStyleDiv(inCr.toString() + " ", '70px'));
 				parentDiv.appendChild(initStyleDiv(jsonStocks[index]["sectorName"] + " ", '100px'));
@@ -184,6 +216,13 @@ section.right{float:right; }
 				sec_entries_near.appendChild(parentDiv);
 			}
 
+			function populateRecentNew52WH(diff) {
+				var i;
+				console.log("diff.length ", diff.length);
+				for (i = 0 ; i < diff.length ; i++)
+					createNew52WHEntry(sec_header_new, diff[i], recentJsonStocksNSE);
+			}
+
 			function populateHeaderNew52WH() {
 				var parentDiv = document.createElement('div');
 				var item;
@@ -199,7 +238,7 @@ section.right{float:right; }
 				sec_header_new.appendChild(parentDiv);
 			}
 
-			function createNew52WHEntry(index) {
+			function createNew52WHEntry(sec, index, data ) {
 				var parentDiv = document.createElement('div');
 				var stockBtn = document.createElement("input");
 
@@ -213,15 +252,15 @@ section.right{float:right; }
 					parentDiv.className = 'oddnum';
 
 				parentDiv.appendChild(initStyleDiv(index +1, '30px'));
-				parentDiv.appendChild(initStyleDiv(jsonStocksNSE[index]["symbol"] + " ", '100px'));
-				parentDiv.appendChild(initStyleDiv(jsonStocksNSE[index]["value"] + " ", '70px'));
-				parentDiv.appendChild(initStyleDiv(jsonStocksNSE[index]["value_old"] + " ", '70px'));
+				parentDiv.appendChild(initStyleDiv(data[index]["symbol"] + " ", '100px'));
+				parentDiv.appendChild(initStyleDiv(data[index]["value"] + " ", '70px'));
+				parentDiv.appendChild(initStyleDiv(data[index]["value_old"] + " ", '70px'));
 
 				stockBtn.setAttribute("style","color:red;font-size:23px");
 				stockBtn.setAttribute("type", 'BUTTON');
 				stockBtn.setAttribute("name", 'chart');
 				stockBtn.setAttribute("value", 'chart');
-				stockBtn.stockName = jsonStocksNSE[index]["symbol"];
+				stockBtn.stockName = data[index]["symbol"];
 				stockBtn.style.float = 'right';
 				/*
 				 * Passing variable to function
@@ -233,7 +272,7 @@ section.right{float:right; }
 
 				parentDiv.appendChild(stockBtn);
 				parentDiv.style.display = 'block';
-				sec_entries_new.appendChild(parentDiv);
+				sec.appendChild(parentDiv);
 			}
 
 			function populateEntriesNear52WH() {
@@ -247,7 +286,7 @@ section.right{float:right; }
 			function populateEntriesNew52WH() {
 				var index = 0;
 				while (index < jsonStocksNSE.length ) {
-					createNew52WHEntry(index);
+					createNew52WHEntry(sec_entries_new, index, jsonStocksNSE);
 					index +=1;
 				}
 			}
