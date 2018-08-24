@@ -220,7 +220,7 @@ section.right{float:right; }
 				var i;
 				console.log("diff.length ", diff.length);
 				for (i = 0 ; i < diff.length ; i++)
-					createNew52WHEntry(sec_header_new, diff[i], recentJsonStocksNSE);
+					createNew52WHEntry(sec_header_new, i, recentJsonStocksNSE[diff[i]]);
 			}
 
 			function populateHeaderNew52WH() {
@@ -252,15 +252,15 @@ section.right{float:right; }
 					parentDiv.className = 'oddnum';
 
 				parentDiv.appendChild(initStyleDiv(index +1, '30px'));
-				parentDiv.appendChild(initStyleDiv(data[index]["symbol"] + " ", '100px'));
-				parentDiv.appendChild(initStyleDiv(data[index]["value"] + " ", '70px'));
-				parentDiv.appendChild(initStyleDiv(data[index]["value_old"] + " ", '70px'));
+				parentDiv.appendChild(initStyleDiv(data["symbol"] + " ", '100px'));
+				parentDiv.appendChild(initStyleDiv(data["value"] + " ", '70px'));
+				parentDiv.appendChild(initStyleDiv(data["value_old"] + " ", '70px'));
 
 				stockBtn.setAttribute("style","color:red;font-size:23px");
 				stockBtn.setAttribute("type", 'BUTTON');
 				stockBtn.setAttribute("name", 'chart');
 				stockBtn.setAttribute("value", 'chart');
-				stockBtn.stockName = data[index]["symbol"];
+				stockBtn.stockName = data["symbol"];
 				stockBtn.style.float = 'right';
 				/*
 				 * Passing variable to function
@@ -286,7 +286,7 @@ section.right{float:right; }
 			function populateEntriesNew52WH() {
 				var index = 0;
 				while (index < jsonStocksNSE.length ) {
-					createNew52WHEntry(sec_entries_new, index, jsonStocksNSE);
+					createNew52WHEntry(sec_entries_new, index, jsonStocksNSE[index]);
 					index +=1;
 				}
 			}
