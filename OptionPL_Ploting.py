@@ -18,10 +18,10 @@ API's available
 Pre-requisite: Download the data from kite using chrome devloper options and saved in the folder.
 """
 
-folder = '30/'
-time = '2018-11-30T09:55:00+0530'
+folder = 'Dec-3/'
+time = '2018-12-03T09:30:00+0530'
 
-capital = 40000
+capital = 60000
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -66,14 +66,15 @@ def findEntryPriceWithTime(df, time):
     temp = df.loc[df.data__candles__001 == time].index
     return round(df.iloc[temp]['Av'],2), df[int(temp.values):]
 
-def analysePair(item1, item2):
+def analysePair(item1, item2):    
     item1File = folder + item1 + '.csv'
     item2File = folder + item2 + '.csv'
 
-    stock1 = pd.read_csv(item1File)
+    stock1 = pd.read_csv(item1File)    
     stock2 = pd.read_csv(item2File)
     
     stock1 = calculateAverage(stock1);
+ 
     stock2 = calculateAverage(stock2);    
     
     EP_item1, stock1 = findEntryPriceWithTime(stock1, time)
@@ -87,11 +88,13 @@ def analysePair(item1, item2):
 
     titlePL = item1 + " (" + str(EP_item1) + " * " + str(item1Size) + ") " + " - "
     titlePL += item2  +" (" + str(EP_item2)+ " * " + str(item2Size) + ") "
+    printGreeks(dict_greekData[item1], item1)
+    printGreeks(dict_greekData[item2], item2)
     
     drawChart(profitDF, 'Time', 'PL', titlePL)
 
 def plotNiftyDistance():
-    nifty = pd.read_csv('Nifty.csv')
+    nifty = pd.read_csv(folder+'Nifty.csv')
     nifty = calculateAverage(nifty)
     
     entryPriceNifty, nifty = findEntryPriceWithTime(nifty, time)
@@ -103,19 +106,49 @@ def plotNiftyDistance():
     titleNifty = "Nifty Movement from Base (" + str(entryPriceNifty) + ")"
     drawChart(nifty, 'Time', 'Points', titleNifty)
 
-def plotOptionsCombination(combi):    
+def printGreeks(List, item):
+    print item, " Delta = ", List[0], " Vega = ", \
+            List[1], " Theta = ", List[2]
+    
+def plotOptionsCombination(greekDict):
+    combi = combinations(greekDict.keys(),2)
     for i in list(combi):
-        if ('CE' in i[0] and 'CE' not in i[1]) :
+        if ('CE' in i[0] and 'CE' not in i[1]):
             analysePair(i[0], i[1])
-        if ('PE' in i[0] and 'PE' not in i[1]) :
+        if ('PE' in i[0] and 'PE' not in i[1]):
             analysePair(i[0], i[1])
 
-combi = combinations(['11000CE', '11100CE', '11200CE',\
-                     '11300CE', '11400CE', '11500CE',\
-                     '10000PE', '10100PE', '10200PE',\
-                     '10300PE', '10400PE', '10500PE'], 2)
-
+"""
+in order delta, vega and theta
+"""
+dict_greekData = {'11000CE' :[0.45, 11.1, 3.8],
+                  '11100CE' :[0.36, 10.5, 3.5],
+                  '11200CE' :[0.28, 9.4, 3.0],
+                  '11300CE' :[0.20, 7.8, 2.4],
+                  '11400CE' :[0.13, 6.0, 1.8],
+                  '11500CE' :[0.09, 4.5, 1.4],
+                  '10000PE' :[0.07, 3.6, 1.8],
+                  '10100PE' :[0.08, 4.3, 2.0],
+                  '10200PE' :[0.11, 5.2, 2.4],
+                  '10300PE' :[0.14, 6.1, 2.8],
+                  '10400PE' :[0.17, 7.1, 3.1],
+                  '10500PE' :[0.21, 8.2, 3.5],
+                  '10600PE' :[0.26, 9.2, 3.8],
+                  '10800PE' :[0.39, 10.8, 4.1],
+                  }
+    
 print "Caluclating entries w.r.t time... ", time
 plotNiftyDistance()
-#plotOptionsCombination(combi)
-analysePair('10000PE', '11400CE')
+#plotOptionsCombination(dict_greekData)
+
+analysePair('11000CE', '10800PE')
+analysePair('11100CE', '10800PE')
+analysePair('11200CE', '10600PE')
+analysePair('11300CE', '10500PE')
+analysePair('11400CE', '10300PE')
+analysePair('11400CE', '10200PE')
+analysePair('11500CE', '10100PE')
+analysePair('11500CE', '10200PE')
+
+
+#analysePair('10000PE', '11300CE')
