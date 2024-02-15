@@ -1,0 +1,50 @@
+// ==UserScript==
+// @name         Trendlyne volume gainers
+// @namespace    http://tampermonkey.net/
+// @version      2024-02-15
+// @description  try to take over the world!
+// @author       arunsudhilal
+// @match        https://trendlyne.com/stock-screeners/volume-based/high-volume-stocks/top-gainers/today/
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=tampermonkey.net
+// @grant        none
+// ==/UserScript==
+
+window.addEventListener('load', function() {
+    'use strict';
+    let btn = document.createElement("button")
+    btn.innerHTML = "Open ChartInk"
+    btn.onclick = () => {
+        openChartInk();
+        console.log("there")
+    }
+
+
+    function openChartInk(){
+        let preTags = document.getElementsByClassName("stockrow");
+        let count = 0;
+        console.log(preTags.length)
+        for (let p of preTags) {
+            let name = p.href;
+            let nameArray = name.split("\/");
+            openPage(nameArray[5]);
+            count++;
+
+            //if (count == preTags.length/2) {
+            //    break;
+            //}
+        }
+    }
+
+    function openPage(stock) {
+        var text = "http://chartink.com/stocks/" + stock + ".html";
+        text = text.replace(/"/g,"");
+        text = text.replace(/ /g,"");
+        window.open(text);
+    }
+
+    console.log("loaded")
+    let t = document.getElementsByClassName("gr m-t-1");
+    t[0].insertBefore(document.createElement('br'), t.childNodes)
+    t[0].insertBefore(btn, t.childNodes)
+});
+//Reference : youtube.com/watch?v=U4dSWJFIQ0A
